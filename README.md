@@ -1,72 +1,39 @@
 # Home Library Service
 
-## Prerequisites
+## How to test
 
-- Git - [Download & Install Git](https://git-scm.com/downloads).
-- Node.js - [Download & Install Node.js](https://nodejs.org/en/download/) and the npm package manager.
+- Install dependencies
 
-## Downloading
+  `npm i`
 
-```
-git clone {repository URL}
-```
+- _(Optionally)_  Set `PORT` variable in `.env`, default value is **4000**
 
-## Installing NPM modules
+- Start the server
 
-```
-npm install
-```
+  **dev**:
 
-## Running application
+  - `npm start`
 
-```
-npm start
-```
+  **prod**:
 
-After starting the app on port (4000 as default) you can open
-in your browser OpenAPI documentation by typing http://localhost:4000/doc/.
-For more information about OpenAPI/Swagger please visit https://swagger.io/.
+  - Clean current build
 
-## Testing
+    `npm run prebuild`
 
-After application running open new terminal and enter:
+  - Run the build
 
-To run all tests without authorization
+    `npm run build`
 
-```
-npm run test
-```
+  - Start the build
 
-To run only one of all test suites
+    `npm run start:prod`
 
-```
-npm run test -- <path to suite>
-```
+- Run tests
 
-To run all test with authorization
+  `npm test`
 
-```
-npm run test:auth
-```
+- Check out API Swagger at `localhost:4000/doc`
 
-To run only specific test suite with authorization
+- To check with linter
 
-```
-npm run test:auth -- <path to suite>
-```
-
-### Auto-fix and format
-
-```
-npm run lint
-```
-
-```
-npm run format
-```
-
-### Debugging in VSCode
-
-Press <kbd>F5</kbd> to debug.
-
-For more information, visit: https://code.visualstudio.com/docs/editor/debugging
+  `npm run lint`

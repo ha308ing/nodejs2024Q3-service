@@ -32,8 +32,8 @@ export class ArtistController {
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseUUIDPipe) id: string) {
-    const isFound = this.artistService.hasOne(id);
+  async findOne(@Param('id', ParseUUIDPipe) id: string) {
+    const isFound = await this.artistService.hasOne(id);
 
     if (!isFound) throw new IdNotFoundException();
 
@@ -41,11 +41,11 @@ export class ArtistController {
   }
 
   @Put(':id')
-  update(
+  async update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body(ValidationPipe) updateArtistDto: UpdateArtistDto,
   ) {
-    const isFound = this.artistService.hasOne(id);
+    const isFound = await this.artistService.hasOne(id);
 
     if (!isFound) throw new IdNotFoundException();
 
@@ -54,8 +54,8 @@ export class ArtistController {
 
   @HttpCode(HttpStatus.NO_CONTENT)
   @Delete(':id')
-  remove(@Param('id', ParseUUIDPipe) id: string) {
-    const isFound = this.artistService.hasOne(id);
+  async remove(@Param('id', ParseUUIDPipe) id: string) {
+    const isFound = await this.artistService.hasOne(id);
 
     if (!isFound) throw new IdNotFoundException();
 

@@ -16,8 +16,8 @@ export class FavsController {
   constructor(private readonly favsService: FavsService) {}
 
   @Post('track/:id')
-  addTrack(@Param('id', ParseUUIDPipe) id: string) {
-    const isTrack = this.favsService.checkTrackId(id);
+  async addTrack(@Param('id', ParseUUIDPipe) id: string) {
+    const isTrack = await this.favsService.checkTrackId(id);
 
     if (!isTrack) throw new UnprocessableEntityException();
 
@@ -25,8 +25,8 @@ export class FavsController {
   }
 
   @Post('album/:id')
-  addAlbum(@Param('id', ParseUUIDPipe) id: string) {
-    const isAlbum = this.favsService.checkAlbumId(id);
+  async addAlbum(@Param('id', ParseUUIDPipe) id: string) {
+    const isAlbum = await this.favsService.checkAlbumId(id);
 
     if (!isAlbum) throw new UnprocessableEntityException();
 
@@ -34,8 +34,8 @@ export class FavsController {
   }
 
   @Post('artist/:id')
-  addArtist(@Param('id', ParseUUIDPipe) id: string) {
-    const isArtist = this.favsService.checkArtistId(id);
+  async addArtist(@Param('id', ParseUUIDPipe) id: string) {
+    const isArtist = await this.favsService.checkArtistId(id);
 
     if (!isArtist) throw new UnprocessableEntityException();
 

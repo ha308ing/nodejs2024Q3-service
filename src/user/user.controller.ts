@@ -15,6 +15,7 @@ import { IdNotFoundException } from 'src/common/exceptions';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserService } from './user.service';
+import { UserEntity } from './entities/user.entity';
 
 @Controller('user')
 export class UserController {
@@ -32,8 +33,8 @@ export class UserController {
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseUUIDPipe) id: string) {
-    const user = this.userService.findOne(id);
+  async findOne(@Param('id', ParseUUIDPipe) id: string): Promise<UserEntity> {
+    const user = await this.userService.findOne(id);
 
     if (user == undefined) throw new IdNotFoundException();
 
@@ -41,11 +42,11 @@ export class UserController {
   }
 
   @Put(':id')
-  update(
+  async update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body(ValidationPipe) updateUserDto: UpdateUserDto,
   ) {
-    const isFound = this.userService.hasOne(id);
+    const isFound = await this.userService.hasOne(id);
 
     if (!isFound) throw new IdNotFoundException();
 
@@ -54,8 +55,8 @@ export class UserController {
 
   @HttpCode(HttpStatus.NO_CONTENT)
   @Delete(':id')
-  remove(@Param('id', ParseUUIDPipe) id: string) {
-    const isFound = this.userService.hasOne(id);
+  async remove(@Param('id', ParseUUIDPipe) id: string) {
+    const isFound = await this.userService.hasOne(id);
 
     if (!isFound) throw new IdNotFoundException();
 

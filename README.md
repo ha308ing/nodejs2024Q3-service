@@ -4,19 +4,31 @@
 
 **Images from docker hub**
 
-`docker compose up` or `npm run docker:start`
+- `docker compose up`
+- or `npm run docker:start`
 
 **Local images**
 
-`docker compose -f docker-compose.local.yml`
+- `docker compose -f docker-compose.local.yml`
+- or `npm run docker:local`
+
+**Watch mode**
+
+`npm run docker:watch`
 
 By default REST service runs at **4000** port (to change, update `PORT` in `.env` file)
 
-**Run tests**: `npm test` (_check out swagger at `_localhost:4000/doc`_)
+**Run tests**:
 
-**To stop containers**: `npm run docker:stop` (_could fail, check ids with `docker ps`_)
+`npm test` (_check out swagger at `localhost:4000/doc`_)
 
-**To scan image vulnerabilites**: `npm run docker:scan`
+**To stop containers**:
+
+`npm run docker:stop` (_could fail, check ids with `docker ps`_)
+
+**To scan image vulnerabilites**:
+
+`npm run docker:scan`
 
 ## How to test
 
@@ -24,7 +36,7 @@ By default REST service runs at **4000** port (to change, update `PORT` in `.env
 
   `npm i`
 
-- _(Optionally)_  Set `PORT` variable in `.env`, default value is **4000**
+- _(Optionally)_ Set `PORT` variable in `.env`, default value is **4000**
 
 - Start the server
 

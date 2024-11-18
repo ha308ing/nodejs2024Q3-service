@@ -4,7 +4,7 @@
 
 **Images from docker hub**
 
-`docker compose up`
+`docker compose up` or `npm run docker:start`
 
 **Local images**
 
@@ -12,11 +12,9 @@
 
 By default REST service runs at **4000** port (to change, update `PORT` in `.env` file)
 
-Open `localhost:4000/doc` for Swagger, or
+**Run tests**: `npm test` (_check out swagger at `_localhost:4000/doc`_)
 
-try requests to `localhost:4000`, like `curl localhost:4000/user`
-
-**Run tests**: `npm test`
+**To stop containers**: `npm run docker:stop` (_could fail, check ids with `docker ps`_)
 
 **To scan image vulnerabilites**: `npm run docker:scan`
 

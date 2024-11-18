@@ -1,3 +1,5 @@
+name: ha308ing
+
 services:
     rest:
         build:

@@ -1,0 +1,47 @@
+services:
+    rest:
+        image: mat1psc/hl-rest
+        env_file: .env
+        environment:
+          - PORT=${PORT}
+          - DATABASE_URL=${DATABASE_URL}
+        ports:
+            - ${PORT}:${PORT}
+        depends_on:
+            db:
+                condition: service_healthy
+                restart: true
+        networks:
+            - net
+    
+    db:
+        image: mat1psc/hl-db
+        env_file: .env
+        environment:
+            - PGDATA=/var/lib/postgresql/db-data
+            - POSTGRES_PORT=${DB_PORT}
+            - POSTGRES_USER=${DB_USER}
+            - POSTGRES_PASSWORD=${DB_PASSWORD}
+            - POSTGRES_DB=${DB_NAME}
+        volumes:
+            - db:/var/lib/postgresql/db-data
+        networks:
+            - net
+        ports:
+          - ${DB_PORT}:${DB_PORT}
+        healthcheck:
+          test:
+            [
+              'CMD-SHELL',
+              'pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}'
+            ]
+          interval: 10s
+          timeout: 5s
+          retries: 5
+
+
+volumes:
+    db:
+networks:
+    net:
+        driver: bridge

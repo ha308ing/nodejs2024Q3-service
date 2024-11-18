@@ -4,7 +4,7 @@
 
 **Images from docker hub**
 
-`docker compose -f docker-compose.yml`
+`docker compose up`
 
 **Local images**
 
@@ -15,6 +15,10 @@ By default REST service runs at **4000** port (to change, update `PORT` in `.env
 Open `localhost:4000/doc` for Swagger, or
 
 try requests to `localhost:4000`, like `curl localhost:4000/user`
+
+**Run tests**: `npm test`
+
+**To scan image vulnerabilites**: `npm run docker:scan`
 
 ## How to test
 

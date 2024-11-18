@@ -1,0 +1,11 @@
+ARG NODE_VERSION=22.9.0-alpine
+
+FROM node:${NODE_VERSION}
+ENV DATABASE_URL="postgresql://postgres:postgres@db:5432/home-library-dev"
+ENV PORT=4000
+COPY package*.json tsconfig*.json nest-cli.json ./
+COPY prisma prisma
+COPY src src
+RUN npm ci && npm run build && npm cache clean --force
+EXPOSE ${PORT}
+CMD ["npm", "run", "start:docker"]

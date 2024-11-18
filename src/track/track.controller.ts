@@ -11,7 +11,7 @@ import {
   Put,
   ValidationPipe,
 } from '@nestjs/common';
-import { IdNotFoundException } from 'src/common/exceptions';
+import { IdNotFoundException } from '../common/exceptions';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
 import { TrackService } from './track.service';
@@ -23,9 +23,7 @@ export class TrackController {
   @HttpCode(HttpStatus.CREATED)
   @Post()
   create(@Body(ValidationPipe) createTrackDto: CreateTrackDto) {
-    const track = this.trackService.create(createTrackDto);
-
-    return track;
+    return this.trackService.create(createTrackDto);
   }
 
   @Get()
@@ -34,8 +32,8 @@ export class TrackController {
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseUUIDPipe) id: string) {
-    const track = this.trackService.findOne(id);
+  async findOne(@Param('id', ParseUUIDPipe) id: string) {
+    const track = await this.trackService.findOne(id);
 
     if (track == undefined) throw new IdNotFoundException();
 
@@ -43,11 +41,11 @@ export class TrackController {
   }
 
   @Put(':id')
-  update(
+  async update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body(ValidationPipe) updateTrackDto: UpdateTrackDto,
   ) {
-    const isFound = this.trackService.hasOne(id);
+    const isFound = await this.trackService.hasOne(id);
 
     if (!isFound) throw new IdNotFoundException();
 
@@ -56,8 +54,8 @@ export class TrackController {
 
   @HttpCode(HttpStatus.NO_CONTENT)
   @Delete(':id')
-  remove(@Param('id', ParseUUIDPipe) id: string) {
-    const isFound = this.trackService.hasOne(id);
+  async remove(@Param('id', ParseUUIDPipe) id: string) {
+    const isFound = await this.trackService.hasOne(id);
 
     if (!isFound) throw new IdNotFoundException();
 

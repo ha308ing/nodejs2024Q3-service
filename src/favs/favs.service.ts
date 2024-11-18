@@ -1,59 +1,192 @@
 import { Injectable } from '@nestjs/common';
-import { AlbumService } from 'src/album/album.service';
-import { ArtistService } from 'src/artist/artist.service';
-import { TrackService } from 'src/track/track.service';
+import { PrismaService } from '../common/prisma.service';
+
+const user_id = '0';
 
 @Injectable()
 export class FavsService {
-  constructor(
-    private readonly albumService: AlbumService,
-    private readonly artistService: ArtistService,
-    private readonly tracksService: TrackService,
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   async getAll() {
     const [artists, albums, tracks] = await Promise.all([
-      this.artistService.getFavs(),
-      this.albumService.getFavs(),
-      this.tracksService.getFavs(),
+      this.getArtists(),
+      this.getAlbums(),
+      this.getTracks(),
     ]);
 
     return { artists, albums, tracks };
   }
 
-  checkTrackId(id: string) {
-    return this.tracksService.hasOne(id);
+  async checkArtistId(id: string) {
+    return (await this.prisma.artist.count({ where: { id } })) > 0;
   }
 
-  addTrack(id: string) {
-    return this.tracksService.addFav(id);
+  async addArtist(id: string) {
+    const { artistsIds } = (await this.prisma.favouriteArtists.findUnique({
+      where: { user_id },
+      select: {
+        artistsIds: true,
+      },
+    })) ?? { artistsIds: [] };
+
+    return this.prisma.favouriteArtists.upsert({
+      where: { user_id },
+      create: { user_id, artistsIds: [id] },
+      update: { artistsIds: [...artistsIds, id] },
+      select: {
+        artistsIds: true,
+      },
+    });
   }
 
-  deleteTrack(id: string) {
-    return this.tracksService.deleteFav(id);
+  async deleteArtist(id: string) {
+    const { artistsIds } = (await this.prisma.favouriteArtists.findUnique({
+      where: { user_id },
+      select: {
+        artistsIds: true,
+      },
+    })) ?? { artistsIds: [] };
+
+    const newArtistsIds = artistsIds.filter((artistId) => artistId != id);
+
+    return this.prisma.favouriteArtists.update({
+      where: {
+        user_id,
+      },
+      data: {
+        artistsIds: newArtistsIds,
+      },
+    });
   }
 
-  checkAlbumId(id: string) {
-    return this.albumService.hasOne(id);
+  async getArtists() {
+    const { artistsIds } = (await this.prisma.favouriteArtists.findUnique({
+      where: { user_id },
+      select: {
+        artistsIds: true,
+      },
+    })) ?? { artistsIds: [] };
+
+    return this.prisma.artist.findMany({
+      where: {
+        id: {
+          in: artistsIds,
+        },
+      },
+    });
   }
 
-  addAlbum(id: string) {
-    return this.albumService.addFav(id);
+  async checkAlbumId(id: string) {
+    return (await this.prisma.album.count({ where: { id } })) > 0;
   }
 
-  deleteAlbum(id: string) {
-    return this.albumService.deleteFav(id);
+  async addAlbum(id: string) {
+    const { albumsIds } = (await this.prisma.favouriteAlbums.findUnique({
+      where: { user_id },
+      select: {
+        albumsIds: true,
+      },
+    })) ?? { albumsIds: [] };
+
+    return this.prisma.favouriteAlbums.upsert({
+      where: { user_id },
+      create: { user_id, albumsIds: [id] },
+      update: { albumsIds: [...albumsIds, id] },
+    });
   }
 
-  checkArtistId(id: string) {
-    return this.artistService.hasOne(id);
+  async deleteAlbum(id: string) {
+    const { albumsIds } = (await this.prisma.favouriteAlbums.findUnique({
+      where: { user_id },
+      select: {
+        albumsIds: true,
+      },
+    })) ?? { albumsIds: [] };
+
+    const newAlbumsIds = albumsIds.filter((albumId) => albumId != id);
+
+    return this.prisma.favouriteAlbums.update({
+      where: {
+        user_id,
+      },
+      data: {
+        albumsIds: newAlbumsIds,
+      },
+    });
   }
 
-  addArtist(id: string) {
-    return this.artistService.addFav(id);
+  async getAlbums() {
+    const { albumsIds } = (await this.prisma.favouriteAlbums.findUnique({
+      where: { user_id },
+      select: {
+        albumsIds: true,
+      },
+    })) ?? { albumsIds: [] };
+
+    return this.prisma.album.findMany({
+      where: {
+        id: {
+          in: albumsIds,
+        },
+      },
+    });
   }
 
-  deleteArtist(id: string) {
-    return this.artistService.deleteFav(id);
+  async checkTrackId(id: string) {
+    return (await this.prisma.track.count({ where: { id } })) > 0;
+  }
+
+  async addTrack(id: string) {
+    const { tracksIds } = (await this.prisma.favouriteTracks.findUnique({
+      where: { user_id },
+      select: {
+        tracksIds: true,
+      },
+    })) ?? { tracksIds: [] };
+
+    return this.prisma.favouriteTracks.upsert({
+      where: { user_id },
+      create: { user_id, tracksIds: [id] },
+      update: { tracksIds: [...tracksIds, id] },
+    });
+  }
+
+  async deleteTrack(id: string) {
+    const { tracksIds } = (await this.prisma.favouriteTracks.findUnique({
+      where: { user_id },
+      select: {
+        tracksIds: true,
+      },
+    })) ?? { tracksIds: [] };
+
+    const newTracksIds = tracksIds.filter((trackId) => trackId != id);
+
+    return this.prisma.favouriteTracks.update({
+      where: {
+        user_id,
+      },
+      data: {
+        tracksIds: newTracksIds,
+      },
+    });
+  }
+
+  async getTracks() {
+    const { tracksIds } = (await this.prisma.favouriteTracks.findUnique({
+      where: {
+        user_id,
+      },
+      select: {
+        tracksIds: true,
+      },
+    })) ?? { tracksIds: [] };
+
+    return this.prisma.track.findMany({
+      where: {
+        id: {
+          in: tracksIds,
+        },
+      },
+    });
   }
 }

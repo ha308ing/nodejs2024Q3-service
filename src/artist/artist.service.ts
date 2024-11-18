@@ -1,67 +1,42 @@
 import { Injectable } from '@nestjs/common';
-import { randomUUID } from 'crypto';
-import { AlbumService } from 'src/album/album.service';
-import { Fav } from 'src/common/fav.generic.service';
-import { TrackService } from 'src/track/track.service';
 import { CreateArtistDto } from './dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
-import type { IArtist } from './interfaces/artist.interface';
+import { PrismaService } from '../common/prisma.service';
 
 @Injectable()
-export class ArtistService extends Fav {
-  private readonly artists = new Map<IArtist['id'], IArtist>();
+export class ArtistService {
+  constructor(private readonly prisma: PrismaService) {}
 
-  constructor(
-    private readonly albumService: AlbumService,
-    private readonly trackService: TrackService,
-  ) {
-    super();
-  }
-
-  create(createArtistDto: CreateArtistDto) {
-    const id = randomUUID();
-
-    const artist = { ...createArtistDto, id };
-
-    this.artists.set(id, artist);
-
-    return artist;
+  create(data: CreateArtistDto) {
+    return this.prisma.artist.create({ data });
   }
 
   findAll() {
-    return Array.from(this.artists.values());
+    return this.prisma.artist.findMany();
   }
 
   findOne(id: string) {
-    return this.artists.get(id);
+    return this.prisma.artist.findUnique({ where: { id } });
   }
 
-  hasOne(id: string) {
-    return this.artists.has(id);
+  async hasOne(id: string) {
+    return (await this.prisma.artist.count({ where: { id } })) > 0;
   }
 
-  update(id: string, updateArtistDto: UpdateArtistDto) {
-    const artist = this.artists.get(id);
+  async update(id: string, data: UpdateArtistDto) {
+    const artist = await this.prisma.artist.findUnique({ where: { id } });
 
     if (artist == undefined) return;
 
-    const newArtist = { ...artist, ...updateArtistDto, id };
-
-    this.artists.set(id, newArtist);
+    const newArtist = await this.prisma.artist.update({
+      where: { id },
+      data,
+    });
 
     return newArtist;
   }
 
   remove(id: string) {
-    this.albumService.removeArtist(id);
-    this.trackService.removeArtist(id);
-    this.deleteFav(id);
-    this.artists.delete(id);
-  }
-
-  async getFavs() {
-    const favIds = this.getFavIds();
-
-    return favIds.map((id) => this.artists.get(id));
+    return this.prisma.artist.delete({ where: { id } });
   }
 }

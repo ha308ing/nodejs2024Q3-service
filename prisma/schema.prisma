@@ -1,0 +1,95 @@
+generator client {
+    provider      = "prisma-client-js"
+    binaryTargets = ["linux-musl-openssl-3.0.x", "windows"]
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+model User {
+    id        String   @id @default(uuid())
+    login     String
+    password  String
+    version   Int      @default(1)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@map("users")
+}
+
+model Artist {
+    id     String  @id @unique @default(uuid())
+    name   String
+    grammy Boolean
+
+    Track Track[]
+    Album Album[]
+
+    @@map("artists")
+}
+
+model Album {
+    id       String  @id @unique @default(uuid())
+    name     String?
+    year     Int
+    artistId String?
+
+    Artist Artist? @relation(fields: [artistId], references: [id], onDelete: SetNull)
+    Track  Track[]
+
+    @@map("albums")
+}
+
+model Track {
+    id       String  @id @unique @default(uuid())
+    name     String
+    artistId String?
+    albumId  String?
+    duration Int
+
+    Artist Artist? @relation(fields: [artistId], references: [id], onDelete: SetNull)
+    Album  Album?  @relation(fields: [albumId], references: [id], onDelete: SetNull)
+
+    @@map("tracks")
+}
+
+model Favourites {
+    id              Int              @default(0)
+    artists         FavouriteArtists @relation(fields: [favs_artists_id], references: [user_id])
+    favs_artists_id String           @unique
+    albums          FavouriteAlbums  @relation(fields: [favs_albums_id], references: [user_id])
+    favs_albums_id  String           @unique
+    tracks          FavouriteTracks  @relation(fields: [favs_tracks_id], references: [user_id])
+    favs_tracks_id  String           @unique
+
+    @@map("favs")
+}
+
+model FavouriteArtists {
+    user_id    String   @id @default("0") @map("id")
+    artistsIds String[]
+
+    Favourites Favourites?
+
+    @@map("favs_artists")
+}
+
+model FavouriteAlbums {
+    user_id   String   @id @default("0") @map("id")
+    albumsIds String[]
+
+    Favourites Favourites?
+
+    @@map("favs_albums")
+}
+
+model FavouriteTracks {
+    user_id   String   @id @default("0") @map("id")
+    tracksIds String[]
+
+    Favourites Favourites?
+
+    @@map("favs_tracks")
+}

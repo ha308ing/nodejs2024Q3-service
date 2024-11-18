@@ -32,8 +32,8 @@ export class AlbumController {
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseUUIDPipe) id: string) {
-    const album = this.albumService.findOne(id);
+  async findOne(@Param('id', ParseUUIDPipe) id: string) {
+    const album = await this.albumService.findOne(id);
 
     if (album == undefined) throw new IdNotFoundException();
 
@@ -41,11 +41,11 @@ export class AlbumController {
   }
 
   @Put(':id')
-  update(
+  async update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body(ValidationPipe) updateAlbumDto: UpdateAlbumDto,
   ) {
-    const isFound = this.albumService.hasOne(id);
+    const isFound = await this.albumService.hasOne(id);
 
     if (!isFound) throw new IdNotFoundException();
 
@@ -54,8 +54,8 @@ export class AlbumController {
 
   @HttpCode(HttpStatus.NO_CONTENT)
   @Delete(':id')
-  remove(@Param('id', ParseUUIDPipe) id: string) {
-    const isFound = this.albumService.hasOne(id);
+  async remove(@Param('id', ParseUUIDPipe) id: string) {
+    const isFound = await this.albumService.hasOne(id);
 
     if (!isFound) throw new IdNotFoundException();
 

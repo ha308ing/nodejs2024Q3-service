@@ -1,76 +1,69 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
-import { randomUUID } from 'node:crypto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { PrismaService } from '../common/prisma.service';
+import { plainToInstance } from 'class-transformer';
+import { UserEntity } from './entities/user.entity';
 
 @Injectable()
 export class UserService {
-  users = new Map();
-  passwords = new Map<string, string>();
+  constructor(private prisma: PrismaService) {}
 
-  create(createUserDto: CreateUserDto) {
-    const { login, password } = createUserDto;
-    const id = randomUUID();
-
-    this.passwords.set(id, password);
-
-    const timestamp = new Date();
-
-    const user = {
-      id,
-      login,
-      version: 1,
-      createdAt: +timestamp,
-      updatedAt: +timestamp,
-    };
-
-    this.users.set(id, user);
-
-    return user;
+  async create(data: CreateUserDto) {
+    return plainToInstance(UserEntity, await this.prisma.user.create({ data }));
   }
 
-  findAll() {
-    return Array.from(this.users.values());
+  async findAll() {
+    const users = await this.prisma.user.findMany();
+
+    return plainToInstance(UserEntity, users);
   }
 
-  hasOne(id: string) {
-    return this.users.has(id);
+  async hasOne(id: string) {
+    return (
+      (await this.prisma.user.count({
+        where: {
+          id,
+        },
+      })) > 0
+    );
   }
 
-  findOne(id: string) {
-    return this.users.get(id);
+  async findOne(id: string): Promise<UserEntity> {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    return plainToInstance(UserEntity, user);
   }
 
-  update(id: string, updateUserDto: UpdateUserDto) {
-    const user = this.users.get(id);
-    const password = this.passwords.get(id);
+  async update(id: string, updateUserDto: UpdateUserDto) {
+    const user = await this.prisma.user.findUnique({ where: { id } });
 
-    if (user == undefined || password == undefined) return;
+    if (user == undefined) return;
 
-    const { login, newPassword, oldPassword } = updateUserDto;
+    const { newPassword, oldPassword } = updateUserDto;
 
-    if (oldPassword != password) {
+    if (oldPassword != user.password) {
       throw new ForbiddenException();
     }
 
-    const updatedAt = +new Date();
+    const updatedUser = await this.prisma.user.update({
+      data: {
+        password: newPassword,
+        version: user.version + 1,
+      },
+      where: { id },
+    });
 
-    const updatedUser = {
-      ...user,
-      login: login ?? user.login,
-      version: ++user.version,
-      updatedAt,
-      id,
-    };
-
-    this.users.set(id, updatedUser);
-    this.passwords.set(id, newPassword);
-
-    return updatedUser;
+    return plainToInstance(UserEntity, updatedUser);
   }
 
   remove(id: string) {
-    this.users.delete(id);
-    this.passwords.delete(id);
+    return this.prisma.user.delete({
+      where: { id },
+    });
   }
 }

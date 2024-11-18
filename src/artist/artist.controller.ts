@@ -11,7 +11,7 @@ import {
   Put,
   ValidationPipe,
 } from '@nestjs/common';
-import { IdNotFoundException } from 'src/common/exceptions';
+import { IdNotFoundException } from '../common/exceptions';
 import { ArtistService } from './artist.service';
 import { CreateArtistDto } from './dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
@@ -32,8 +32,8 @@ export class ArtistController {
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseUUIDPipe) id: string) {
-    const isFound = this.artistService.hasOne(id);
+  async findOne(@Param('id', ParseUUIDPipe) id: string) {
+    const isFound = await this.artistService.hasOne(id);
 
     if (!isFound) throw new IdNotFoundException();
 
@@ -41,11 +41,11 @@ export class ArtistController {
   }
 
   @Put(':id')
-  update(
+  async update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body(ValidationPipe) updateArtistDto: UpdateArtistDto,
   ) {
-    const isFound = this.artistService.hasOne(id);
+    const isFound = await this.artistService.hasOne(id);
 
     if (!isFound) throw new IdNotFoundException();
 
@@ -54,8 +54,8 @@ export class ArtistController {
 
   @HttpCode(HttpStatus.NO_CONTENT)
   @Delete(':id')
-  remove(@Param('id', ParseUUIDPipe) id: string) {
-    const isFound = this.artistService.hasOne(id);
+  async remove(@Param('id', ParseUUIDPipe) id: string) {
+    const isFound = await this.artistService.hasOne(id);
 
     if (!isFound) throw new IdNotFoundException();
 

@@ -31,8 +31,6 @@ services:
             - db:/var/lib/postgresql/db-data
         networks:
             - net
-        ports:
-          - ${DB_PORT}:${DB_PORT}
         healthcheck:
           test:
             [

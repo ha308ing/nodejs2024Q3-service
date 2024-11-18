@@ -11,7 +11,7 @@ import {
   Put,
   ValidationPipe,
 } from '@nestjs/common';
-import { IdNotFoundException } from 'src/common/exceptions';
+import { IdNotFoundException } from '../common/exceptions';
 import { ArtistService } from './artist.service';
 import { CreateArtistDto } from './dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';

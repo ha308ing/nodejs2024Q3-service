@@ -11,7 +11,7 @@ import {
   Put,
   ValidationPipe,
 } from '@nestjs/common';
-import { IdNotFoundException } from 'src/common/exceptions';
+import { IdNotFoundException } from '../common/exceptions';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
 import { TrackService } from './track.service';

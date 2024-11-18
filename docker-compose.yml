@@ -1,6 +1,7 @@
 services:
     rest:
         image: mat1psc/hl-rest
+        restart: on-failure:3
         env_file: .env
         environment:
           - PORT=${PORT}
@@ -16,6 +17,7 @@ services:
     
     db:
         image: mat1psc/hl-db
+        restart: on-failure:3
         env_file: .env
         environment:
             - PGDATA=/var/lib/postgresql/db-data

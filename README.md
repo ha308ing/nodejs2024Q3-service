@@ -1,5 +1,21 @@
 # Home Library Service
 
+## How to run containers
+
+**Images from docker hub**
+
+`docker compose -f docker-compose.yml`
+
+**Local images**
+
+`docker compose -f docker-compose.local.yml`
+
+By default REST service runs at **4000** port (to change, update `PORT` in `.env` file)
+
+Open `localhost:4000/doc` for Swagger, or
+
+try requests to `localhost:4000`, like `curl localhost:4000/user`
+
 ## How to test
 
 - Install dependencies

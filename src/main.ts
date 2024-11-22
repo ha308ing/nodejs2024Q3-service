@@ -35,9 +35,18 @@ async function bootstrap() {
   addModuleSwagger('track', TrackModule);
   addModuleSwagger('favs', FavsModule);
 
-  app.useLogger(new LoggerService());
+  const logger = new LoggerService();
+  app.useLogger(logger);
 
   await app.listen(PORT);
+
+  process.on('uncaughtException', async (error) => {
+    logger.fatal(`[UncaughtException]: ${error}`);
+  });
+
+  process.on('unhandledRejection', async (error) => {
+    logger.fatal(`[unhandledRejection] ${error}`);
+  });
 
   function addModuleSwagger(
     path: string,

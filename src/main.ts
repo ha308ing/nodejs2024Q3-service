@@ -8,13 +8,16 @@ import { FavsModule } from './favs/favs.module';
 import { TrackModule } from './track/track.module';
 import { UserModule } from './user/user.module';
 import 'dotenv/config';
+import { logLevels } from './common/log-levels';
 
 const PORT = process.env?.PORT ?? 4000;
 
 const swaggerEndpoint = 'doc';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    logger: logLevels,
+  });
 
   const config = new DocumentBuilder()
     .setTitle('REST Service')

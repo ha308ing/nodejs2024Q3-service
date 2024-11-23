@@ -66,4 +66,17 @@ export class UserService {
       where: { id },
     });
   }
+
+  async findOneByLogin(login: string) {
+    const user = await this.prisma.user.findFirst({
+      where: {
+        login,
+      },
+    });
+
+    return {
+      user: plainToInstance(UserEntity, user),
+      password: user?.password,
+    };
+  }
 }

@@ -8,6 +8,7 @@ import { UserService } from '../user/user.service';
 import { LoginDto } from './dto/login.dto';
 import { RefreshDto } from './dto/refresh.dto';
 import { UserEntity } from '../user/entities/user.entity';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
@@ -21,17 +22,25 @@ export class AuthService {
 
     if (user != null) throw new UnauthorizedException();
 
+    const rounds = parseInt(process.env?.CRYPT_SALT);
+    const salt = await bcrypt.genSalt(rounds);
+
+    const passwordHash = await bcrypt.hash(data.password, salt);
+    data.password = passwordHash;
+
     const newUser = await this.userService.create(data);
 
     return this.addUserTokens(newUser);
   }
 
   async login(data: LoginDto) {
-    const { user, password } = await this.userService.findOneByLogin(
+    const { user, password: hash } = await this.userService.findOneByLogin(
       data.login,
     );
 
-    if (password !== data.password) throw new UnauthorizedException();
+    const isMatch = await bcrypt.compare(data.password, hash);
+
+    if (!isMatch) throw new UnauthorizedException();
 
     return this.addUserTokens(user);
   }

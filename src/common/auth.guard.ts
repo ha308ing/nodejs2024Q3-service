@@ -1,6 +1,7 @@
 import {
   CanActivate,
   ExecutionContext,
+  ForbiddenException,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -8,6 +9,8 @@ import { Reflector } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 import { IS_PUBLIC_KEY } from './public.decorator';
+
+const tokenForbiddenErrors = ['jwt malformed', 'jwt expired'];
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -22,20 +25,23 @@ export class AuthGuard implements CanActivate {
       context.getClass(),
     ]);
 
-    if (isPublic) return true;
-
     const request = context.switchToHttp().getRequest();
     const token = this.extractTokenFromHeader(request);
+    const refreshToken = request.body?.refreshToken;
 
-    if (token == undefined) throw new UnauthorizedException();
+    if (isPublic && refreshToken == undefined) return true;
 
     try {
-      const payload = await this.jwtService.verifyAsync(token, {
-        secret: process.env?.JWT_SECRET_KEY,
+      const payload = await this.jwtService.verifyAsync(refreshToken ?? token, {
+        secret: refreshToken
+          ? process.env?.JWT_SECRET_REFRESH_KEY
+          : process.env?.JWT_SECRET_KEY,
       });
 
       request['userId'] = payload?.userId;
-    } catch {
+    } catch (error) {
+      if (tokenForbiddenErrors.includes(error.message))
+        throw new ForbiddenException();
       throw new UnauthorizedException();
     }
     return true;

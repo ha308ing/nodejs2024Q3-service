@@ -30,7 +30,6 @@ export class AuthController {
     return this.authService.login(input);
   }
 
-  @Public()
   @HttpCode(HttpStatus.OK)
   @Post('refresh')
   refresh(

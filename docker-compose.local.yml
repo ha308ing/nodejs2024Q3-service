@@ -18,6 +18,8 @@ services:
                 restart: true
         networks:
             - net
+        volumes:
+            - rest:/logs
     
     db:
         build:
@@ -48,6 +50,7 @@ services:
 
 volumes:
     db:
+    rest:
 networks:
     net:
         driver: bridge

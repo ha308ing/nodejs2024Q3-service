@@ -26,6 +26,7 @@
     "docker:start": "docker compose up -d",
     "docker:stop": "docker container stop ha308ing-rest-1 ha308ing-db-1",
     "docker:local": "docker compose -f docker-compose.local.yml up -d",
+    "docker:local-down": "docker compose -f docker-compose.local.yml down",
     "docker:watch": "docker compose -f docker-compose.watch.yml up --watch"
   },
   "dependencies": {

@@ -8,13 +8,18 @@ import { FavsModule } from './favs/favs.module';
 import { TrackModule } from './track/track.module';
 import { UserModule } from './user/user.module';
 import 'dotenv/config';
+import { logLevels } from './common/log-levels';
+import { LoggerService } from './logger/logger.service';
 
 const PORT = process.env?.PORT ?? 4000;
 
 const swaggerEndpoint = 'doc';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    logger: logLevels,
+    bufferLogs: true,
+  });
 
   const config = new DocumentBuilder()
     .setTitle('REST Service')
@@ -30,7 +35,18 @@ async function bootstrap() {
   addModuleSwagger('track', TrackModule);
   addModuleSwagger('favs', FavsModule);
 
+  const logger = new LoggerService();
+  app.useLogger(logger);
+
   await app.listen(PORT);
+
+  process.on('uncaughtException', async (error) => {
+    logger.fatal(`[UncaughtException]: ${error}`);
+  });
+
+  process.on('unhandledRejection', async (error) => {
+    logger.fatal(`[unhandledRejection] ${error}`);
+  });
 
   function addModuleSwagger(
     path: string,

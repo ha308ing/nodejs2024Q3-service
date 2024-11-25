@@ -18,6 +18,8 @@ services:
                 restart: true
         networks:
             - net
+        volumes:
+            - rest:/logs
     
     db:
         build:
@@ -31,6 +33,8 @@ services:
             - POSTGRES_USER=${DB_USER}
             - POSTGRES_PASSWORD=${DB_PASSWORD}
             - POSTGRES_DB=${DB_NAME}
+        ports:
+            - ${DB_PORT}:${DB_PORT}
         volumes:
             - db:/var/lib/postgresql/db-data
         networks:
@@ -48,6 +52,7 @@ services:
 
 volumes:
     db:
+    rest:
 networks:
     net:
         driver: bridge

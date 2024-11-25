@@ -1,17 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../common/prisma.service';
 
-const user_id = '0';
-
 @Injectable()
 export class FavsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async getAll() {
+  async getAll(user_id: string) {
     const [artists, albums, tracks] = await Promise.all([
-      this.getArtists(),
-      this.getAlbums(),
-      this.getTracks(),
+      this.getArtists(user_id),
+      this.getAlbums(user_id),
+      this.getTracks(user_id),
     ]);
 
     return { artists, albums, tracks };
@@ -21,7 +19,7 @@ export class FavsService {
     return (await this.prisma.artist.count({ where: { id } })) > 0;
   }
 
-  async addArtist(id: string) {
+  async addArtist(user_id: string, id: string) {
     const { artistsIds } = (await this.prisma.favouriteArtists.findUnique({
       where: { user_id },
       select: {
@@ -39,7 +37,7 @@ export class FavsService {
     });
   }
 
-  async deleteArtist(id: string) {
+  async deleteArtist(user_id: string, id: string) {
     const { artistsIds } = (await this.prisma.favouriteArtists.findUnique({
       where: { user_id },
       select: {
@@ -59,7 +57,7 @@ export class FavsService {
     });
   }
 
-  async getArtists() {
+  async getArtists(user_id: string) {
     const { artistsIds } = (await this.prisma.favouriteArtists.findUnique({
       where: { user_id },
       select: {
@@ -80,7 +78,7 @@ export class FavsService {
     return (await this.prisma.album.count({ where: { id } })) > 0;
   }
 
-  async addAlbum(id: string) {
+  async addAlbum(user_id: string, id: string) {
     const { albumsIds } = (await this.prisma.favouriteAlbums.findUnique({
       where: { user_id },
       select: {
@@ -95,7 +93,7 @@ export class FavsService {
     });
   }
 
-  async deleteAlbum(id: string) {
+  async deleteAlbum(user_id: string, id: string) {
     const { albumsIds } = (await this.prisma.favouriteAlbums.findUnique({
       where: { user_id },
       select: {
@@ -115,7 +113,7 @@ export class FavsService {
     });
   }
 
-  async getAlbums() {
+  async getAlbums(user_id: string) {
     const { albumsIds } = (await this.prisma.favouriteAlbums.findUnique({
       where: { user_id },
       select: {
@@ -136,7 +134,7 @@ export class FavsService {
     return (await this.prisma.track.count({ where: { id } })) > 0;
   }
 
-  async addTrack(id: string) {
+  async addTrack(user_id: string, id: string) {
     const { tracksIds } = (await this.prisma.favouriteTracks.findUnique({
       where: { user_id },
       select: {
@@ -151,7 +149,7 @@ export class FavsService {
     });
   }
 
-  async deleteTrack(id: string) {
+  async deleteTrack(user_id: string, id: string) {
     const { tracksIds } = (await this.prisma.favouriteTracks.findUnique({
       where: { user_id },
       select: {
@@ -171,7 +169,7 @@ export class FavsService {
     });
   }
 
-  async getTracks() {
+  async getTracks(user_id: string) {
     const { tracksIds } = (await this.prisma.favouriteTracks.findUnique({
       where: {
         user_id,
